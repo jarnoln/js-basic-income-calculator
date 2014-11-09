@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title> Basic Income Calculator </title>
+</head>
+
+<body>
+<h1> Basic Income Calculator </h1>
+
+<table id="basic_income_table">
+</table>
+
+<script>
+var basic_income = 1000;
+var margin = 50;
+
+var table = document.getElementById("basic_income_table");
+
+for (var income=0; income<4000; income+=500) {
+  account_transfer = basic_income - (margin * income) / 100;
+  gross = income + account_transfer;
+  var row = document.createElement('tr');
+  row.innerHTML = "<td>" + income + "</td> <td>" + account_transfer + "</td>";
+  // row.innerHTML = "Tadaa!"
+  table.appendChild(row);
+}
+
+</script>
+</p>
+
