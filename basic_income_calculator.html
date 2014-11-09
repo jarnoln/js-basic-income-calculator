@@ -2,28 +2,57 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title> Basic Income Calculator </title>
+<title> Perustulolaskuri </title>
 </head>
 
 <body>
-<h1> Basic Income Calculator </h1>
+<h1> Perustulolaskuri </h1>
 
-<table id="basic_income_table">
+<table id="basic_income_table" style="text-align: right">
+<tr> <th> Tulot </th> <th> Tililtä </th> <th> Tilille </th> <th> Valtiolle </th> <th> Käteen </th> <th> Kokonaisvero-% </th> </tr>
 </table>
 
 <script>
-var basic_income = 1000;
-var margin = 50;
+var basic_income = 750;         // Amount given by government for everyone
+var margin = 50;                // Margin deducted from income
+var mandatory_save_pct = 50;    // WHic part of the deduction goes to own account, rest goes to government.
 
 var table = document.getElementById("basic_income_table");
 
-for (var income=0; income<4000; income+=500) {
-  account_transfer = basic_income - (margin * income) / 100;
-  gross = income + account_transfer;
-  var row = document.createElement('tr');
-  row.innerHTML = "<td>" + income + "</td> <td>" + account_transfer + "</td>";
+for (var income=0; income<=10000; income+=500) {
+  var transfer = basic_income - (margin * income) / 100;
+  console.log('transfer:', transfer);
+  var account_transfer = transfer;
+  var to_government = 0;
+  var to_account = 0;
+  var from_account = transfer;
+  if (transfer < 0)
+  {
+    account_transfer = mandatory_save_pct * transfer / 100;
+    to_government = transfer - account_transfer;
+    to_account = -account_transfer;
+    from_account = 0;
+  }
+  gross = income + transfer;
+  if (income > 0) {
+    gross_tax = (income - gross) * 100 / income;
+  } else {
+    gross_tax = 0
+  }
+  var line = "<td>" + income + "</td>";
+  line +=  "<td>" + from_account + "</td>";
+  line +=  "<td>" + to_account + "</td>";
+  line +=  "<td>" + to_government + "</td>";
+  line +=  "<td>" + gross + "</td>";
+  if (income === 0) {
+    line += "<td> - </td>";
+  } else {
+    line +=  "<td>" + parseFloat(gross_tax).toFixed(1) + "% </td>";
+  }
+  var rowElement = document.createElement('tr');
+  rowElement.innerHTML = line;
   // row.innerHTML = "Tadaa!"
-  table.appendChild(row);
+  table.appendChild(rowElement);
 }
 
 </script>
