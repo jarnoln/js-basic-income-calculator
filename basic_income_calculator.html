@@ -8,13 +8,13 @@
 <body>
 <h1> Perustulolaskuri </h1>
 
-<form id="basic_income_form" action="#">
+<form id="basic_income_form" action="">
   <fieldset>
-     <label for="basic_income_amount">Perustulo</label>
-     <input id="basic_income_amount" type="text">
-     <label for="margin_pct">Veroprosentti</label>
-     <input id="margin_pct" type="text">
-     <input type="submit" value="Laske">
+     <label for="input_basic_income_amount">Perustulo</label>
+     <input id="input_basic_income_amount" type="number" min="0" value="750">
+     <label for="input_margin_pct">Veroprosentti</label>
+     <input id="input_margin_pct" type="number" min="0" max="100" value="50">
+     <input id="calculate_button" type="button" value="Laske">
    </fieldset>
 </form>
 
@@ -25,11 +25,25 @@
 <script>
 
 function calculate_basic_income_table(basic_income, margin, mandatory_save_pct) {
+  // basic_income: Amount given by government for everyone
+  // margin: Margin deducted from income
+  // mandatory_save_pct: Which part of the deduction goes to own account, rest goes to government.
+
+  console.log('calculate_basic_income_table');
   var table = document.getElementById("basic_income_table");
 
-  for (var income=0; income<=10000; income+=500) {
+  // Erase old lines
+  var old_rows = table.childNodes;
+  console.log(old_rows.length, 'old table rows');
+  while(old_rows.length > 2) {
+  	var line = old_rows[old_rows.length-1];
+  	table.removeChild(line);
+  	// console.log('Removed line');
+  }
+  
+  for (var income=0; income<=4000; income+=500) {
     var transfer = basic_income - (margin * income) / 100;
-    console.log('transfer:', transfer);
+    // console.log('transfer:', transfer);
     var account_transfer = transfer;
     var to_government = 0;
     var to_account = 0;
@@ -58,20 +72,33 @@ function calculate_basic_income_table(basic_income, margin, mandatory_save_pct) 
     }
     var rowElement = document.createElement('tr');
     rowElement.innerHTML = line;
-    // row.innerHTML = "Tadaa!"
     table.appendChild(rowElement);
   }
 }
 
+function read_values_and_calculate() {
+	var basic_income = parseInt(document.getElementById("input_basic_income_amount").value) || 750;
+	var margin = parseInt(document.getElementById("input_margin_pct").value) || 50;
+	var mandatory_save_pct = 50                	
+	calculate_basic_income_table(basic_income, margin, mandatory_save_pct);	
+}
+
+function calculate_button_clicked(event) {
+	console.log('Click');
+    read_values_and_calculate();
+}
+
 function init() {
-    var basic_income = 750;         // Amount given by government for everyone
-    var margin = 50;                // Margin deducted from income
-    var mandatory_save_pct = 50;    // Which part of the deduction goes to own account, rest goes to government.
-    calculate_basic_income_table(basic_income, margin, mandatory_save_pct);
+	var calculate_button = document.getElementById("calculate_button");
+	calculate_button.onclick = calculate_button_clicked;
+	read_values_and_calculate();
 }
 
 addEventListener('load', init);
 
 </script>
-</p>
+
+</body>
+</html>
+
 
