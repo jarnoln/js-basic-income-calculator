@@ -19,10 +19,25 @@
 </form>
 
 <table id="basic_income_table" style="text-align: right">
+<tr> <th> Tulot </th> <th> Valtiolta </th> <th> Käteen </th> <th> Kokonaisvero-% </th> </tr>
+</table>
+
+<table id="basic_income_and_account_table" style="text-align: right">
 <tr> <th> Tulot </th> <th> Tililtä </th> <th> Tilille </th> <th> Valtiolle </th> <th> Käteen </th> <th> Kokonaisvero-% </th> </tr>
 </table>
 
 <script>
+
+// Remove rows from table (except header row)
+function clear_table(table) {
+  var old_rows = table.childNodes;
+  console.log(old_rows.length, 'old table rows');
+  while(old_rows.length > 2) {
+  	var line = old_rows[old_rows.length-1];
+  	table.removeChild(line);
+  	// console.log('Removed line');
+  }	
+}
 
 function calculate_basic_income_table(basic_income, margin, mandatory_save_pct) {
   // basic_income: Amount given by government for everyone
@@ -30,16 +45,12 @@ function calculate_basic_income_table(basic_income, margin, mandatory_save_pct) 
   // mandatory_save_pct: Which part of the deduction goes to own account, rest goes to government.
 
   console.log('calculate_basic_income_table');
-  var table = document.getElementById("basic_income_table");
-
+  var basic_table = document.getElementById("basic_income_table");
+  var account_table = document.getElementById("basic_income_and_account_table");
+  
   // Erase old lines
-  var old_rows = table.childNodes;
-  console.log(old_rows.length, 'old table rows');
-  while(old_rows.length > 2) {
-  	var line = old_rows[old_rows.length-1];
-  	table.removeChild(line);
-  	// console.log('Removed line');
-  }
+  clear_table(basic_table);
+  clear_table(account_table);
   
   for (var income=0; income<=4000; income+=500) {
     var transfer = basic_income - (margin * income) / 100;
@@ -60,6 +71,19 @@ function calculate_basic_income_table(basic_income, margin, mandatory_save_pct) 
     } else {
       gross_tax = 0
     }
+        
+    var line = "<td>" + income + "</td>";
+    line +=  "<td>" + transfer + "</td>";
+    line +=  "<td>" + gross + "</td>";
+    if (income === 0) {
+      line += "<td> - </td>";
+    } else {
+      line +=  "<td>" + parseFloat(gross_tax).toFixed(1) + "% </td>";
+    }
+    var rowElement = document.createElement('tr');
+    rowElement.innerHTML = line;
+    basic_table.appendChild(rowElement);       
+
     var line = "<td>" + income + "</td>";
     line +=  "<td>" + from_account + "</td>";
     line +=  "<td>" + to_account + "</td>";
@@ -72,7 +96,7 @@ function calculate_basic_income_table(basic_income, margin, mandatory_save_pct) 
     }
     var rowElement = document.createElement('tr');
     rowElement.innerHTML = line;
-    table.appendChild(rowElement);
+    account_table.appendChild(rowElement);       
   }
 }
 
