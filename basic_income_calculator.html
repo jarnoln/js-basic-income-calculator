@@ -12,14 +12,16 @@
   <fieldset>
      <label for="input_basic_income_amount">Perustulo</label>
      <input id="input_basic_income_amount" type="number" min="0" value="750">
-     <label for="input_margin_pct">Veroprosentti</label>
+     <label for="input_margin_pct">Vero-%</label>
      <input id="input_margin_pct" type="number" min="0" max="100" value="50">
-     <input id="calculate_button" type="button" value="Laske">
+     <label for="mandatory_save_pct">Säästö-%</label>
+     <input id="mandatory_save_pct" type="number" min="0" max="100" value="50">
+     <input id="calculate_button" type="button" value="Laske">     
    </fieldset>
 </form>
 
 <table id="basic_income_table" style="text-align: right">
-<tr> <th> Tulot </th> <th> Valtiolta </th> <th> Käteen </th> <th> Kokonaisvero-% </th> </tr>
+<tr> <th> Tulot </th> <th> Valtio </th> <th> Käteen </th> <th> Kokonaisvero-% </th> </tr>
 </table>
 
 <table id="basic_income_and_account_table" style="text-align: right">
@@ -44,7 +46,9 @@ function calculate_basic_income_table(basic_income, margin, mandatory_save_pct) 
   // margin: Margin deducted from income
   // mandatory_save_pct: Which part of the deduction goes to own account, rest goes to government.
 
-  console.log('calculate_basic_income_table');
+  console.log('calculate_basic_income_table: basic_income', basic_income,
+  			  'margin:', margin,
+  			  'save_pct', mandatory_save_pct);
   var basic_table = document.getElementById("basic_income_table");
   var account_table = document.getElementById("basic_income_and_account_table");
   
@@ -85,10 +89,10 @@ function calculate_basic_income_table(basic_income, margin, mandatory_save_pct) 
     basic_table.appendChild(rowElement);       
 
     var line = "<td>" + income + "</td>";
-    line +=  "<td>" + from_account + "</td>";
-    line +=  "<td>" + to_account + "</td>";
-    line +=  "<td>" + to_government + "</td>";
-    line +=  "<td>" + gross + "</td>";
+    line +=  "<td>" + from_account.toFixed(0) + "</td>";
+    line +=  "<td>" + -to_account.toFixed(0) + "</td>";
+    line +=  "<td>" + to_government.toFixed(0) + "</td>";
+    line +=  "<td>" + gross.toFixed(0) + "</td>";
     if (income === 0) {
       line += "<td> - </td>";
     } else {
@@ -101,9 +105,20 @@ function calculate_basic_income_table(basic_income, margin, mandatory_save_pct) 
 }
 
 function read_values_and_calculate() {
-	var basic_income = parseInt(document.getElementById("input_basic_income_amount").value) || 750;
-	var margin = parseInt(document.getElementById("input_margin_pct").value) || 50;
-	var mandatory_save_pct = 50                	
+	var basic_income = parseInt(document.getElementById("input_basic_income_amount").value);
+	if ((basic_income == NaN) || (basic_income < 0)) {
+		basic_income = 0;
+	} 
+	
+	var margin = parseInt(document.getElementById("input_margin_pct").value);
+	if ((margin == NaN) || (margin < 0) || (margin > 100)) {		
+		margin = 50;
+	}
+	var mandatory_save_pct = parseInt(document.getElementById("mandatory_save_pct").value);
+	if ((mandatory_save_pct == NaN) || (mandatory_save_pct < 0) || (mandatory_save_pct > 100)) {
+		mandatory_save_pct = 0;
+	}
+	
 	calculate_basic_income_table(basic_income, margin, mandatory_save_pct);	
 }
 
